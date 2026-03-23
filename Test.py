@@ -104,6 +104,13 @@ QUESTIONS = [
 ]
 
 PASS_MARK = 0.75
+SIMILARITY_THRESHOLD = 0.8
+
+
+def is_close_enough(user_answer, correct_answer):
+    from difflib import SequenceMatcher
+    ratio = SequenceMatcher(None, user_answer, correct_answer).ratio()
+    return ratio >= SIMILARITY_THRESHOLD
 
 
 def run_test():
@@ -119,14 +126,18 @@ def run_test():
 
     print("\nOkay, let's begin.\n")
 
+    import random
+    questions = QUESTIONS[:]
+    random.shuffle(questions)
+
     score = 0
     wrong = []
 
-    for i, q in enumerate(QUESTIONS, 1):
+    for i, q in enumerate(questions, 1):
         print(f"Q{i}: {q['question']}")
         user_answer = input("Your answer: ").strip().lower()
 
-        if user_answer == q["answer"]:
+        if is_close_enough(user_answer, q["answer"]):
             print("Correct!\n")
             score += 1
         else:
